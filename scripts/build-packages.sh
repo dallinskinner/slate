@@ -24,6 +24,7 @@ KEYID=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/{print $10; exit}'
 # 2. Package tree
 rm -rf "$STAGE"; mkdir -p "$STAGE/DEBIAN"
 cp -a "$ROOT/overlay/." "$STAGE/"
+find "$STAGE" -name __pycache__ -prune -exec rm -rf {} +
 install -Dm644 "$ROOT/branding/slate-logo.svg" "$STAGE/usr/share/slate/slate-logo.svg"
 install -d "$STAGE/usr/share/keyrings" "$STAGE/etc/apt/sources.list.d"
 gpg --export "$KEYID" > "$STAGE/usr/share/keyrings/slate-archive-keyring.gpg"

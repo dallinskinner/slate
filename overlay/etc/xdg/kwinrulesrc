@@ -1,0 +1,11 @@
+# Slate: keep Slate Welcome above windows that Plasma restores from the last session
+[General]
+count=1
+rules=slate-welcome
+
+[slate-welcome]
+Description=Slate Welcome stays on top
+wmclass=slate-welcome
+wmclassmatch=1
+above=true
+aboverule=2

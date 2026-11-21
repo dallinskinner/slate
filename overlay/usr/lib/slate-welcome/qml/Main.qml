@@ -245,9 +245,12 @@ ApplicationWindow {
                 ColumnLayout {
                     spacing: 16
                     ScrollView {
+                        id: newsScroll
                         Layout.fillWidth: true; Layout.fillHeight: true
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        contentWidth: availableWidth
                         Text {
-                            width: card.width - 72
+                            width: newsScroll.availableWidth
                             text: backend.whatsNew
                             textFormat: Text.MarkdownText
                             wrapMode: Text.WordWrap

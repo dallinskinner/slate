@@ -270,6 +270,8 @@ def main():
         if last == ver:
             return 0
         mode = 'update' if last else 'full'
+    if '--auto' in args:
+        time.sleep(4)   # let Plasma restore the last session's windows first, then open on top
     app = QGuiApplication(sys.argv[:1])
     app.setApplicationName('slate-welcome'); app.setDesktopFileName('slate-welcome')
     app.setWindowIcon(QIcon.fromTheme('slate-launcher'))
@@ -279,10 +281,11 @@ def main():
     engine.load(QUrl.fromLocalFile(os.path.join(HERE, 'qml', 'Main.qml')))
     if not engine.rootObjects():
         return 1
+    win = engine.rootObjects()[0]
+    win.raise_(); win.requestActivate()
     shot = os.environ.get('SLATE_WELCOME_SHOT')    # dev: save screenshots, e.g. "/tmp/w:3,5"
     if shot:
         base, _, times = shot.partition(':')
-        win = engine.rootObjects()[0]
         for i, t in enumerate(float(x) for x in times.split(',')):
             QTimer.singleShot(int(t * 1000), lambda i=i: win.grabWindow().save(f'{base}{i}.png'))
         QTimer.singleShot(int(max(float(x) for x in times.split(',')) * 1000) + 300, app.quit)
