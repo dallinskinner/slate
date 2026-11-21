@@ -1,0 +1,17 @@
+{
+  "os_list": [
+    {
+      "name": "UTMOS",
+      "default_os_name": "UTMOS",
+      "boot_object": "m1n1",
+      "next_object": "m1n1/boot.bin",
+      "package": "utmos-asahi.zip",
+      "supported_fw": ["13.5"],
+      "partitions": [
+        {"name": "EFI", "type": "EFI", "size": "500MB", "format": "fat",
+         "volume_id": "0x4a5b6c7d", "copy_firmware": true, "copy_installer_data": true, "source": "esp"},
+        {"name": "Root", "type": "Linux", "size": "6GB", "expand": true, "image": "root.img"}
+      ]
+    }
+  ]
+}

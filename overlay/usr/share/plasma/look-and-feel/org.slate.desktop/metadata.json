@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Slate"
+            }
+        ],
+        "Category": "",
+        "Description": "Slate: dark gray and lime, ChromeOS-style shelf",
+        "Id": "org.slate.desktop",
+        "License": "GPLv2+",
+        "Name": "Slate",
+        "Website": "https://www.debian.org"
+    }
+}

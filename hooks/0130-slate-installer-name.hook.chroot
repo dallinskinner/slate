@@ -1,0 +1,14 @@
+#!/bin/sh
+# Live session: the installer launcher and desktop icon say "Install Slate" (Debian's file
+# says "Install Debian"; add-calamares-desktop-icon copies this same file to ~/Desktop).
+set -e
+f=/usr/share/applications/calamares-install-debian.desktop
+sed -i -e 's/^Name=.*/Name=Install Slate/' -e '/^Name\[/d' \
+       -e '/^GenericName\[/d' -e '/^Comment\[/d' -e 's/^Icon=.*/Icon=calamares/' "$f"
+
+# Run the installer with the Slate (Plasma) theme: pkexec wipes the environment, so root's
+# Calamares loaded no Qt theme and looked light. The live user has passwordless sudo
+# (live-config), and this wrapper already uses sudo; keep root's own HOME.
+sed -i 's|^pkexec calamares$|sudo -E env HOME=/root QT_QPA_PLATFORMTHEME=kde QT_QPA_PLATFORM=xcb calamares|' \
+    /usr/bin/calamares-install-debian
+grep -q 'QT_QPA_PLATFORMTHEME=kde' /usr/bin/calamares-install-debian

@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "Slate-Hatch",
+    "Name": "Slate Hatch",
+    "License": "CC-BY-SA-4.0",
+    "Authors": [
+      {
+        "Name": "Slate"
+      }
+    ]
+  }
+}

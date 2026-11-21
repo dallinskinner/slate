@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "Slate-Basalt",
+    "Name": "Slate 0.2 Basalt",
+    "License": "CC-BY-SA-4.0",
+    "Authors": [
+      {
+        "Name": "Slate"
+      }
+    ]
+  }
+}

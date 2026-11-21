@@ -1,0 +1,4 @@
+#!/bin/sh
+# Download the FaceTime HD camera firmware from Apple and install it (checksums verified).
+[ -s /lib/firmware/facetimehd/firmware.bin ] && [ "$1" != --force ] && { echo "firmware already installed"; exit 0; }
+exec bash /usr/share/slate-facetimehd/facetimehd-firmware-install.sh

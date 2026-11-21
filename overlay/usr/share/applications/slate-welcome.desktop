@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to Slate
+GenericName=Welcome and quick setup
+Comment=Replay the Slate welcome and change theme, accent color and wallpaper
+Exec=slate-welcome
+Icon=slate-launcher
+Categories=System;Settings;
+Keywords=welcome;setup;theme;wallpaper;accent;

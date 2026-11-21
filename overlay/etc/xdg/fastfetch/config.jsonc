@@ -1,0 +1,19 @@
+// Slate defaults for fastfetch (`slate` or `fastfetch`). Your own ~/.config/fastfetch wins.
+{
+  "logo": {
+    "type": "file",
+    "source": "/usr/share/slate/ascii/current.txt",
+    "color": { "1": "38;2;182;242;58", "2": "38;2;132;176;46", "3": "38;2;82;106;34" },
+    "padding": { "top": 1, "right": 3 }
+  },
+  "display": {
+    "separator": "  ",
+    "color": { "keys": "38;2;182;242;58", "title": "38;2;182;242;58" }
+  },
+  "modules": [
+    "title", "separator",
+    "os", "kernel", "uptime", "packages", "de", "wm", "terminal",
+    "cpu", "gpu", "memory", "disk", "battery",
+    "break", "colors"
+  ]
+}

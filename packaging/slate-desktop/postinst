@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+brave_shortcut() {   # Meta+B opens Brave (Plasma reads X-KDE-Shortcuts from /usr/share/kglobalaccel)
+	b=/usr/share/applications/brave-browser.desktop
+	[ -f "$b" ] || return 0
+	mkdir -p /usr/share/kglobalaccel
+	sed '/^\[Desktop Entry\]$/a X-KDE-Shortcuts=Meta+B' "$b" > /usr/share/kglobalaccel/brave-browser.desktop
+}
+
+case "$1" in
+configure)
+	ln -sfn ../usr/lib/os-release /etc/os-release
+	rm -f /usr/share/slate/os-release          # Slate 0.1 leftover
+	rm -f /etc/apt/sources.list.d/slate-join.sources   # from join-updates.sh; slate.sources replaces it
+	brave_shortcut
+	# Slate boot splash (the initramfs is rebuilt through the update-initramfs trigger)
+	if command -v plymouth-set-default-theme >/dev/null 2>&1 &&
+	   [ "$(plymouth-set-default-theme 2>/dev/null)" != slate ]; then
+		plymouth-set-default-theme slate || true
+	fi
+	# Apply GRUB defaults on an installed system (not while an image is being built)
+	if [ -e /boot/grub/grub.cfg ] && command -v update-grub >/dev/null 2>&1; then
+		update-grub || true
+	fi
+	;;
+triggered)
+	brave_shortcut
+	;;
+esac
+exit 0

@@ -1,0 +1,11 @@
+#!/bin/sh
+# Install Slate's own files as the slate-desktop package (built by scripts/build-packages.sh),
+# so installed systems get new Slate versions from the Slate update server. Runs after
+# 0200-brave so the Meta+B shortcut file is made right away.
+set -e
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends /root/slate-desktop.deb
+rm -f /root/slate-desktop.deb
+# The boot splash must be in the live initramfs too (the package's trigger already ran
+# update-initramfs; make sure every kernel has it)
+update-initramfs -u -k all
+apt-get clean

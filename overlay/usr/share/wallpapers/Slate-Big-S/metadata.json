@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "Slate-Big-S",
+    "Name": "Slate Big S",
+    "License": "CC-BY-SA-4.0",
+    "Authors": [
+      {
+        "Name": "Slate"
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Slate Welcome
+Comment=Welcome animation and quick setup (first login and after each Slate upgrade)
+Exec=slate-welcome --auto
+Icon=slate-launcher
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2

@@ -1,0 +1,69 @@
+# Slate GRUB theme (installed systems). Images and fonts: branding/build-assets.py
+desktop-image: "background.png"
+desktop-image-scale-method: "crop"
+desktop-color: "#1a1b1e"
+title-text: ""
+terminal-font: "Hack Regular 14"
+terminal-left: "15%"
+terminal-top: "15%"
+terminal-width: "70%"
+terminal-height: "70%"
+
++ image {
+        top = 14%
+        left = 50%-160
+        file = "wordmark.png"
+}
+
++ boot_menu {
+        left = 50%-360
+        width = 720
+        top = 34%
+        height = 40%
+        menu_pixmap_style = "menu_*.png"
+        item_font = "Hack Regular 18"
+        item_color = "#c8c8c8"
+        selected_item_font = "Hack Bold 18"
+        selected_item_color = "#111214"
+        selected_item_pixmap_style = "select_*.png"
+        item_height = 40
+        item_padding = 20
+        item_spacing = 8
+        icon_width = 0
+        icon_height = 0
+        item_icon_space = 0
+        scrollbar = false
+}
+
++ progress_bar {
+        id = "__timeout__"
+        left = 50%-360
+        width = 720
+        top = 78%
+        height = 4
+        fg_color = "#b6f23a"
+        bg_color = "#2a2b2f"
+        border_color = "#2a2b2f"
+        show_text = false
+}
+
++ label {
+        id = "__timeout__"
+        left = 0
+        width = 100%
+        top = 78%+16
+        align = "center"
+        color = "#8a8a8a"
+        font = "Hack Regular 14"
+        text = "Starting the selected entry in %d s"
+}
+
++ label {
+        left = 0
+        width = 100%
+        top = 100%-48
+        align = "center"
+        color = "#8a8a8a"
+        font = "Hack Regular 14"
+        text = "Up/Down choose    Enter start    e edit    c command line"
+}

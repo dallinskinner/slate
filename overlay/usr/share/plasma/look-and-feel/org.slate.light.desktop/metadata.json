@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Slate"
+            }
+        ],
+        "Category": "",
+        "Description": "Slate in light gray with the lime accent, same shelf",
+        "Id": "org.slate.light.desktop",
+        "License": "GPLv2+",
+        "Name": "Slate Light",
+        "Website": "https://www.debian.org"
+    }
+}

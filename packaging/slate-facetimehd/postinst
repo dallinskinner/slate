@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+M=facetimehd; V=@DRIVER_VERSION@
+case "$1" in
+configure)
+	dkms status -m $M -v $V 2>/dev/null | grep -q . || dkms add -m $M -v $V
+	# build for every installed kernel that has headers
+	for k in /lib/modules/*; do
+		k=$(basename "$k")
+		[ -e "/lib/modules/$k/build" ] || continue
+		dkms build -m $M -v $V -k "$k" && dkms install -m $M -v $V -k "$k" || \
+			echo "slate-facetimehd: could not build the driver for kernel $k" >&2
+	done
+	# firmware from Apple (not redistributable). A failed download doesn't fail the install:
+	# re-run with `sudo slate-facetimehd-firmware` once online.
+	/usr/sbin/slate-facetimehd-firmware || \
+		echo "slate-facetimehd: firmware download failed; run: sudo slate-facetimehd-firmware" >&2
+	# load it now on a running Mac (not inside an image build)
+	if [ -d /sys/bus/pci ] && grep -qs 0x1570 /sys/bus/pci/devices/*/device; then
+		modprobe -r bdc_pci 2>/dev/null || true
+		modprobe $M 2>/dev/null || true
+	fi
+	;;
+esac
+exit 0

@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "Slate-Glow",
+    "Name": "Slate Glow",
+    "License": "CC-BY-SA-4.0",
+    "Authors": [
+      {
+        "Name": "Slate"
+      }
+    ]
+  }
+}

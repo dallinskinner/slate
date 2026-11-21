@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "Slate-Light",
+    "Name": "Slate Light",
+    "License": "CC-BY-SA-4.0",
+    "Authors": [
+      {
+        "Name": "Slate"
+      }
+    ]
+  }
+}

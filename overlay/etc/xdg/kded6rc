@@ -1,0 +1,4 @@
+# Slate: KDE's Welcome Center no longer opens by itself; Slate Welcome replaces it.
+# (It is still installed and can be opened from the launcher.)
+[Module-plasma-welcome]
+autoload=false

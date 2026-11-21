@@ -1,0 +1,5 @@
+#!/bin/sh
+# Console login banner (os-release, splash etc. come from the slate-desktop package).
+set -e
+echo "Slate" > /etc/issue.net
+printf 'Slate \\n \\l\n\n' > /etc/issue

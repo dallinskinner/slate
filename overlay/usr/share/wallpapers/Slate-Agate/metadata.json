@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "Slate-Agate",
+    "Name": "Slate 0.1 Agate",
+    "License": "CC-BY-SA-4.0",
+    "Authors": [
+      {
+        "Name": "Slate"
+      }
+    ]
+  }
+}

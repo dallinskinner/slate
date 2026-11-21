@@ -1,0 +1,33 @@
+---
+componentName:   slate
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,580px
+windowPlacement: center
+strings:
+    productName:         Slate
+    shortProductName:    Slate
+    version:             0.1
+    shortVersion:        0.1
+    versionedName:       Slate 0.2 Basalt
+    shortVersionedName:  Slate Basalt
+    bootloaderEntryName: Slate
+    productUrl:          https://www.debian.org
+    supportUrl:          https://www.debian.org/support
+    knownIssuesUrl:      https://bugs.debian.org
+    releaseNotesUrl:     https://www.debian.org/releases/trixie/releasenotes
+    donateUrl:           https://www.debian.org
+sidebar: widget
+navigation: widget
+images:
+    productLogo:         "slate-logo.png"
+    productIcon:         "slate-logo.png"
+    productWelcome:      "welcome.png"
+slideshow:               "show.qml"
+style:
+   SidebarBackground:        "#111214"
+   SidebarText:              "#e6e6e6"
+   SidebarTextCurrent:       "#111214"
+   SidebarBackgroundCurrent: "#b6f23a"
+slideshowAPI: 2

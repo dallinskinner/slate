@@ -1,0 +1,11 @@
+#!/bin/sh
+# Install Brave from Brave's apt repo. Done in a hook (not the package list) because
+# live-build adds package-list sources before ca-certificates exists in the chroot,
+# so HTTPS repos fail there. The source list + key come from live-overlay/ and stay
+# in the installed system, so Brave updates with normal `apt upgrade`.
+set -e
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends brave-browser
+apt-get clean
+
+# (Meta+B for Brave: made by slate-desktop, hooks/0300, and kept current by its dpkg trigger)

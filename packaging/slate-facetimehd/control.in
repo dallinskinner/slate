@@ -1,0 +1,13 @@
+Package: slate-facetimehd
+Version: @VERSION@
+Architecture: all
+Maintainer: Slate <slate@example.invalid>
+Installed-Size: @SIZE@
+Section: kernel
+Priority: optional
+Depends: dkms, linux-headers-amd64, curl, xz-utils, cpio, ca-certificates
+Description: FaceTime HD camera driver for MacBooks (Slate)
+ The facetimehd driver (github.com/patjak/facetimehd), built with DKMS, plus
+ the camera firmware. Apple's firmware can't be redistributed, so it is
+ downloaded from Apple's update server during installation (about 18 MB) and
+ checked against known SHA-256 checksums.

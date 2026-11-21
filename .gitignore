@@ -1,0 +1,12 @@
+# never publish
+packaging/gnupg/
+# big / local-only
+build/
+vm/
+# separate git repo (github.com/dallinskinner/slate-updates)
+repo/
+# generated previews
+branding/png/
+# local working notes (describe this machine's disks)
+docs/HANDOFF.md
+__pycache__/

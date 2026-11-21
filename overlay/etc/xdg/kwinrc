@@ -1,0 +1,12 @@
+# Slate window defaults
+[org.kde.kdecoration2]
+library=org.kde.breeze
+theme=Breeze
+ButtonsOnLeft=
+ButtonsOnRight=IAX
+
+[Windows]
+Placement=Centered
+
+[Plugins]
+blurEnabled=true

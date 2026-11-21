@@ -1,0 +1,32 @@
+#!/bin/sh
+# Divert Debian's os-release to os-release.debian so slate-desktop can ship Slate's.
+set -e
+
+drop_local_divert() {   # Slate 0.1 (and live-build during image builds) used local diverts
+	owner=$(dpkg-divert --listpackage "$1" || true)
+	case "$owner" in
+		"" | slate-desktop) return 1 ;;
+		LOCAL) dpkg-divert --quiet --local --remove --no-rename "$1" ;;
+		*) dpkg-divert --quiet --package "$owner" --remove --no-rename "$1" ;;
+	esac
+}
+
+case "$1" in
+install|upgrade)
+	f=/usr/lib/os-release
+	drop_local_divert "$f" || true
+	if [ "$(dpkg-divert --listpackage "$f" || true)" != slate-desktop ]; then
+		# keep Debian's copy as .debian (copy, not rename: os-release must never be missing)
+		[ -e "$f.debian" ] || [ -L "$f.debian" ] || cp -a "$f" "$f.debian"
+		dpkg-divert --quiet --package slate-desktop --add --no-rename --divert "$f.debian" "$f"
+	fi
+	# /etc/os-release goes back to Debian's normal symlink (made in postinst)
+	f=/etc/os-release
+	if [ "$(dpkg-divert --listpackage "$f" || true)" = LOCAL ]; then
+		div=$(dpkg-divert --truename "$f")
+		dpkg-divert --quiet --local --remove --no-rename "$f"
+		[ "$div" = "$f" ] || rm -f "$div"
+	fi
+	;;
+esac
+exit 0

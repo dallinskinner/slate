@@ -1,0 +1,105 @@
+# Core
+systemd-sysv
+sudo
+network-manager
+os-prober
+dosfstools
+ntfs-3g
+btrfs-progs
+mtools
+linux-image-amd64
+
+# Boot (UEFI + Secure Boot via Debian's signed shim/GRUB)
+grub-efi-amd64
+grub-efi-amd64-signed
+shim-signed
+efibootmgr
+
+# Boot splash
+plymouth
+plymouth-themes
+
+# Firmware / microcode for real hardware
+firmware-linux-free
+firmware-linux-nonfree
+firmware-misc-nonfree
+firmware-iwlwifi
+firmware-realtek
+amd64-microcode
+intel-microcode
+
+# Broadcom Wi-Fi, e.g. MacBook Pro A1398 (2012-2015):
+#  BCM4331 / BCM4360 -> proprietary "wl" driver, built by DKMS against the kernel headers
+#  BCM43602 (2015)   -> open brcmfmac driver + firmware (not blocked by wl's blacklist)
+dkms
+linux-headers-amd64
+broadcom-sta-dkms
+firmware-brcm80211
+
+# Audio / graphics
+pipewire
+pipewire-pulse
+wireplumber
+mesa-utils
+
+# Desktop: KDE Plasma (Wayland), styled as Slate (ChromeOS-like shelf)
+kde-plasma-desktop
+kwin-wayland
+xwayland
+sddm
+sddm-theme-breeze
+kde-config-sddm
+plasma-nm
+plasma-pa
+powerdevil
+kscreen
+bluedevil
+plasma-discover
+breeze-gtk-theme
+kde-config-gtk-style
+xdg-desktop-portal-kde
+polkit-kde-agent-1
+
+# Round app icons (used by the Slate icon theme) + fallbacks
+numix-icon-theme-circle
+papirus-icon-theme
+
+# Installer
+calamares
+calamares-settings-debian
+
+# Apps (Brave comes from hooks/0200-brave.hook.chroot)
+dolphin
+konsole
+kde-spectacle
+gwenview
+okular
+ark
+kcalc
+mpv
+gvfs
+wl-clipboard
+libnotify-bin
+xdg-utils
+xdg-user-dirs
+
+# Fonts
+fonts-noto-core
+fonts-noto-color-emoji
+
+# Slate Welcome (PyQt6 + QML) and `slate` system info
+python3-pyqt6
+python3-pyqt6.qtquick
+qml6-module-qtquick-controls
+qml6-module-qtquick-layouts
+qml6-module-qtquick-window
+fastfetch
+fonts-hack
+
+# Tools
+git
+curl
+ca-certificates
+htop
+python3
+unzip

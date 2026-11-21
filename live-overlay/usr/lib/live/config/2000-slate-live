@@ -1,0 +1,45 @@
+#!/bin/sh
+# Slate: live-session-only tweaks. live-config runs this at live boot only; the installed
+# system is copied from the untouched image, so none of this carries over.
+
+. /usr/lib/live/config.sh
+
+Init ()
+{
+	if component_was_executed "slate-live"
+	then
+		exit 0
+	fi
+	echo -n " slate-live"
+}
+
+Config ()
+{
+	# The live user logs in without a password, so KDE Wallet would ask to create a
+	# wallet the first time Brave (or Wi-Fi) wants to store a secret. Turn it off here;
+	# on the installed system pam_kwallet unlocks the wallet with the login password.
+	mkdir -p /etc/xdg
+	cat > /etc/xdg/kwalletrc << EOF2
+[Wallet]
+Enabled=false
+EOF2
+
+	# No Plasma "Welcome Center" tour on the live USB (it still shows after install).
+	mkdir -p "/home/${LIVE_USERNAME:-slate}/.config"
+	cat > "/home/${LIVE_USERNAME:-slate}/.config/plasma-welcomerc" << EOF2
+[General]
+LastSeenVersion=99.0.0
+EOF2
+	# No automatic screen lock on the live USB (its password, "live", isn't obvious).
+	cat > "/home/${LIVE_USERNAME:-slate}/.config/kscreenlockerrc" << EOF2
+[Daemon]
+Autolock=false
+LockOnResume=false
+EOF2
+	chown -R "${LIVE_USERNAME:-slate}:" "/home/${LIVE_USERNAME:-slate}/.config" 2>/dev/null || true
+
+	touch /var/lib/live/config/slate-live
+}
+
+Init
+Config

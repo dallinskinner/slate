@@ -1,0 +1,14 @@
+PRETTY_NAME="Slate 0.2 (Basalt)"
+NAME="Slate"
+ID=slate
+ID_LIKE=debian
+VERSION_ID="0.2"
+VERSION="0.2 (Basalt)"
+# Debian's codename on purpose: third-party installers (Docker, Brave, ...) read this
+# field to pick their Debian packages. Slate's own release name is SLATE_CODENAME.
+VERSION_CODENAME=trixie
+DEBIAN_CODENAME=trixie
+SLATE_CODENAME=basalt
+HOME_URL="https://dallinskinner.github.io/slate"
+LOGO=slate-launcher
+ANSI_COLOR="38;2;182;242;58"

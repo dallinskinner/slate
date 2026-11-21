@@ -1,0 +1,4 @@
+# Regenerate the Meta+B shortcut file whenever Brave updates its .desktop file
+interest-noawait /usr/share/applications/brave-browser.desktop
+# Rebuild the initramfs once per apt run, so a new boot splash is used
+activate-noawait update-initramfs

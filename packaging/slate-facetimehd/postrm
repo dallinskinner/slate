@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+[ "$1" = purge ] && rm -rf /lib/firmware/facetimehd /usr/lib/firmware/facetimehd
+exit 0

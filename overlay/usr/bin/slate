@@ -1,0 +1,14 @@
+#!/bin/sh
+# slate: small helper for Slate systems
+case "${1:-info}" in
+  info)    exec fastfetch ;;
+  welcome) exec slate-welcome ;;
+  update)  sudo apt update && sudo apt full-upgrade ;;
+  version) . /etc/os-release; echo "$PRETTY_NAME"
+           dpkg-query -W -f='slate-desktop ${Version}\n' slate-desktop 2>/dev/null ;;
+  *)       echo "usage: slate [info|welcome|update|version]"
+           echo "  info     system info with this release's rock (default)"
+           echo "  welcome  replay the welcome animation and quick setup"
+           echo "  update   install all updates (Debian, apps and Slate)"
+           echo "  version  Slate release and slate-desktop package version" ;;
+esac
