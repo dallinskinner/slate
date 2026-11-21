@@ -90,6 +90,15 @@ section.features, section.get, section.term-section { padding: 18vh var(--gutter
 .shelf-demo.in .apps .dot:nth-child(3) { transition-delay: .26s } .shelf-demo.in .apps .dot:nth-child(4) { transition-delay: .34s }
 .shelf-demo.in .apps .dot:nth-child(5) { transition-delay: .42s }
 
+/* screenshots: horizontal, snapping */
+section.shots { padding: 18vh 0 4vh; }
+section.shots > .kicker, section.shots > h2 { max-width: 1240px; margin-left: auto; margin-right: auto; padding: 0 var(--gutter); }
+.shot-row { display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4vh var(--gutter) 3vh;
+  scrollbar-width: thin; scrollbar-color: #3a3b40 transparent; }
+.shot { flex: 0 0 min(780px, 84vw); margin: 0; scroll-snap-align: center; }
+.shot img { width: 100%; height: auto; display: block; border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,.6), inset 0 0 0 1px #2c2d31; }
+.shot figcaption { color: var(--muted); font-size: 15px; margin-top: 12px; }
+
 /* terminal */
 .term-section { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 4vw; align-items: center; }
 @media (max-width: 900px) { .term-section { grid-template-columns: 1fr; } }
