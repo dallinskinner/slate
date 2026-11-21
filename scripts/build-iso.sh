@@ -18,7 +18,7 @@ case "$REPO_URL" in *REPLACE-ME*)
   echo "Set REPO_URL in packaging/repo.conf first (the update server; see docs/updates.md)."
   exit 1 ;;
 esac
-./scripts/build-packages.sh
+[ -n "${SLATE_SKIP_PACKAGES:-}" ] || ./scripts/build-packages.sh   # (skip when built beforehand)
 DEB="$ROOT/build/packages/slate-desktop_${VERSION}_all.deb"
 
 sudo -v   # ask for the password once, up front
