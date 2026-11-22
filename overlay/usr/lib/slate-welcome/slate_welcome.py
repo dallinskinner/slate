@@ -5,8 +5,13 @@
   slate-welcome --auto     from autostart: full welcome on first login, animation + "what's
                            new" once after each Slate version upgrade, otherwise nothing
   slate-welcome --whatsnew animation + what's new
+  slate-welcome --patch    no animation: notes for this release's point updates (0.2.1, 0.2.2, ...)
+
+Point updates (a new slate-desktop version within the same VERSION_ID) don't replay the
+animation: --auto shows a notification with a "What's new" button instead, once per update
+that ships notes in /usr/share/slate/releases/<version>.md.
 """
-import configparser, glob, json, math, os, random, sys, time
+import configparser, glob, json, math, os, random, subprocess, sys, time
 from PyQt6.QtCore import (QObject, QProcess, QTimer, QUrl, pyqtProperty, pyqtSignal, pyqtSlot)
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
@@ -39,10 +44,11 @@ def read_conf():
     return c
 
 
-def mark_seen(version):
+def mark_seen(version, patch=None):
     c = read_conf()
     if not c.has_section('General'): c.add_section('General')
     c.set('General', 'LastSeenVersion', version)
+    if patch: c.set('General', 'LastSeenPatch', patch)
     os.makedirs(os.path.dirname(CONF), exist_ok=True)
     with open(CONF, 'w') as f: c.write(f)
 
@@ -56,6 +62,50 @@ def has_facetime_camera():
         except OSError:
             pass
     return False
+
+
+def pkg_version():
+    """Installed slate-desktop version, e.g. '0.2.3' (empty when unknown)."""
+    v = os.environ.get('SLATE_PKG_VERSION')
+    if v is not None: return v
+    try:
+        return subprocess.run(['dpkg-query', '-W', '-f=${Version}', 'slate-desktop'],
+                              capture_output=True, text=True, timeout=10).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ''
+
+
+def vkey(v):
+    return tuple(int(p) if p.isdigit() else 0 for p in v.replace('-', '.').split('.'))
+
+
+def patch_notes(release):
+    """[(version, markdown)] for this release's point updates, newest first."""
+    out = []
+    for f in glob.glob(os.path.join(SHARE, 'releases', release + '.*.md')):
+        v = os.path.basename(f)[:-3]
+        try: out.append((v, open(f).read()))
+        except OSError: pass
+    return sorted(out, key=lambda n: vkey(n[0]), reverse=True)
+
+
+def notify_patch(patch, notes):
+    """Desktop notification for a point update; its button opens the patch notes."""
+    body = next((l.strip('-* ').strip() for l in notes.splitlines()
+                 if l.strip() and not l.startswith('#')), 'Fixes and improvements.')
+    try:
+        r = subprocess.run(['notify-send', '--app-name=Slate', '--icon=slate-launcher',
+                            "--action=notes=What's new", f'Slate updated to {patch}', body],
+                           capture_output=True, text=True)
+    except OSError:
+        return 0
+    if r.stdout.strip() == 'notes':
+        os.execvp(sys.executable, [sys.executable, os.path.abspath(__file__), '--patch'])
+    return 0
+
+
+def has_camera_driver():
+    return os.path.exists(TEST_ROOT + '/usr/sbin/slate-facetimehd-firmware')
 
 
 def is_live():
@@ -79,7 +129,7 @@ class Backend(QObject):
         self._version = rel.get('VERSION_ID', '0.2')
         self._name = (rel.get('SLATE_CODENAME') or 'basalt').capitalize()
         self._mode = mode
-        self._camera = has_facetime_camera() and not is_live()
+        self._camera = has_facetime_camera() and not is_live() and not has_camera_driver()
         self._live = is_live()
         self._status = ''
         self._accent = None
@@ -173,7 +223,8 @@ class Backend(QObject):
     @pyqtProperty(bool, constant=True)
     def live(self): return self._live
     @pyqtProperty(int, constant=True)
-    def startPage(self):    # dev/testing: open straight at a card
+    def startPage(self):    # patch notes skip the animation; dev/testing: open at a card
+        if self._mode == 'patch': return 0
         return int(os.environ.get('SLATE_WELCOME_PAGE', '-1'))
     @pyqtProperty(str, notify=statusChanged)
     def status(self): return self._status
@@ -183,8 +234,16 @@ class Backend(QObject):
                                   'contents/splash/images/slate-wordmark.png').toString()
     @pyqtProperty(str, constant=True)
     def whatsNew(self):
+        if self._mode == 'patch':
+            notes = patch_notes(self._version)
+            return '\n\n'.join(n for _v, n in notes) or 'Fixes and improvements.'
         try: return open(os.path.join(SHARE, 'releases', self._version + '.md')).read()
         except OSError: return f'Slate {self._version} {self._name}.'
+    @pyqtProperty(str, constant=True)
+    def whatsNewTitle(self):
+        if self._mode == 'patch':
+            return "What's new in " + (pkg_version() or self._version)
+        return "What's new in " + self._name
     @pyqtProperty(list, constant=True)
     def accents(self): return [{'name': n, 'color': c} for n, c in ACCENTS]
     @pyqtProperty(list, constant=True)
@@ -257,7 +316,7 @@ class Backend(QObject):
 
     @pyqtSlot()
     def finish(self):
-        mark_seen(self._version)
+        mark_seen(self._version, pkg_version())
         QGuiApplication.quit()
 
 
@@ -267,9 +326,18 @@ def main():
     mode = 'full'
     if '--whatsnew' in args:
         mode = 'update'
+    elif '--patch' in args:
+        mode = 'patch'
     elif '--auto' in args:
-        last = read_conf().get('General', 'LastSeenVersion', fallback='')
-        if last == ver:
+        conf = read_conf()
+        last = conf.get('General', 'LastSeenVersion', fallback='')
+        if last == ver:     # same release: maybe a point update with notes to announce
+            patch = pkg_version()
+            seen = conf.get('General', 'LastSeenPatch', fallback='')
+            notes = dict(patch_notes(ver))
+            if patch and patch != seen and patch in notes:
+                mark_seen(ver, patch)
+                return notify_patch(patch, notes[patch])
             return 0
         mode = 'update' if last else 'full'
     if '--auto' in args:

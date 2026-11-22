@@ -16,6 +16,23 @@ nouveau_nvidia() {
 	return 1
 }
 
+# Old Macs get no firmware from LVFS, and Discover shows "Failed to download metadata for
+# lvfs" when it refreshes before Wi-Fi is up: turn the LVFS remote off on Apple hardware.
+# The marker lets the remote come back if this disk ends up in a PC.
+LVFS_MARK=/var/lib/slate/lvfs-off
+lvfs_quirk() {
+	command -v fwupdmgr >/dev/null 2>&1 || return 0
+	vendor=${SLATE_SYS_VENDOR:-$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)}
+	if [ "$vendor" = "Apple Inc." ]; then
+		[ -e "$LVFS_MARK" ] && return 0
+		timeout 60 fwupdmgr disable-remote lvfs --assume-yes >/dev/null 2>&1 || return 0
+		mkdir -p "${LVFS_MARK%/*}"; touch "$LVFS_MARK"
+	elif [ -e "$LVFS_MARK" ]; then
+		timeout 60 fwupdmgr enable-remote lvfs --assume-yes >/dev/null 2>&1 && rm -f "$LVFS_MARK"
+	fi
+}
+lvfs_quirk
+
 if nouveau_nvidia; then
 	mkdir -p "${POL%/*}"
 	printf '{\n  "HardwareAccelerationModeEnabled": false\n}\n' > "$POL"

@@ -1,14 +1,48 @@
 #!/bin/sh
 # slate: small helper for Slate systems
+notes() {   # point-update notes for this release, newest first
+	. /etc/os-release
+	ls /usr/share/slate/releases/"$VERSION_ID".*.md 2>/dev/null | sort -t. -k3,3nr | while read -r f; do
+		cat "$f"; echo
+	done
+}
+
+doctor() {   # troubleshooting report: ~/slate-doctor.txt, also copied to the clipboard
+	out="$HOME/slate-doctor.txt"
+	{
+		echo "== Slate doctor  $(date -Is)"
+		. /etc/os-release; echo "$PRETTY_NAME"
+		dpkg-query -W -f='${Package} ${Version}\n' slate-desktop slate-facetimehd 2>/dev/null
+		echo "kernel $(uname -r)  model $(cat /sys/class/dmi/id/product_name 2>/dev/null) ($(cat /sys/class/dmi/id/sys_vendor 2>/dev/null))"
+		echo "session ${XDG_SESSION_TYPE:-?} ${XDG_CURRENT_DESKTOP:-?}"
+		echo; echo "== Graphics, network, camera"
+		lspci -nnk 2>/dev/null | grep -A3 -E 'VGA|3D|Display|Network|Ethernet|Multimedia' | grep -v -E '^--$'
+		echo; echo "== Drivers built by DKMS"; dkms status 2>/dev/null || echo "(dkms not installed)"
+		echo; echo "== Network"; nmcli -t device 2>/dev/null
+		echo; echo "== Slate updates"; apt-cache policy slate-desktop 2>/dev/null | head -4
+		echo "pkexec: $(command -v pkexec || echo MISSING)"
+		pol=/etc/brave/policies/managed/slate-gpu.json
+		echo "brave policy: $([ -e $pol ] && tr -d '\n ' < $pol || echo none)"
+		echo; echo "== Disk"; df -h / /home 2>/dev/null | uniq
+		echo; echo "== Failed services"; systemctl --failed --no-legend 2>/dev/null; systemctl --user --failed --no-legend 2>/dev/null
+		echo; echo "== Recent errors (this boot)"; journalctl -b -p err --no-pager -q -n 50 2>/dev/null
+	} > "$out" 2>&1
+	command -v wl-copy >/dev/null && [ -n "${WAYLAND_DISPLAY:-}" ] && wl-copy < "$out" && copied=" and copied to the clipboard"
+	echo "Saved to $out${copied:-}. Paste it into a message to share it."
+}
+
 case "${1:-info}" in
   info)    exec fastfetch ;;
   welcome) exec slate-welcome ;;
   update)  sudo apt update && sudo apt full-upgrade ;;
   version) . /etc/os-release; echo "$PRETTY_NAME"
-           dpkg-query -W -f='slate-desktop ${Version}\n' slate-desktop 2>/dev/null ;;
-  *)       echo "usage: slate [info|welcome|update|version]"
+           dpkg-query -W -f='slate-desktop ${Version}\n\n' slate-desktop 2>/dev/null
+           notes ;;
+  doctor)  doctor ;;
+  *)       echo "usage: slate [info|welcome|update|version|doctor]"
            echo "  info     system info with this release's rock (default)"
            echo "  welcome  replay the welcome animation and quick setup"
            echo "  update   install all updates (Debian, apps and Slate)"
-           echo "  version  Slate release and slate-desktop package version" ;;
+           echo "  version  Slate version and what changed in recent updates"
+           echo "  doctor   save a troubleshooting report (and copy it to the clipboard)" ;;
 esac

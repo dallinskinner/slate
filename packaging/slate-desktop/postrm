@@ -6,6 +6,10 @@ remove|abort-install|disappear)
 		--divert /usr/lib/os-release.debian /usr/lib/os-release
 	rm -f /usr/share/kglobalaccel/brave-browser.desktop
 	rm -f /etc/brave/policies/managed/slate-gpu.json
+	if [ -e /var/lib/slate/lvfs-off ] && command -v fwupdmgr >/dev/null 2>&1; then
+		timeout 60 fwupdmgr enable-remote lvfs --assume-yes >/dev/null 2>&1 || true
+	fi
+	rm -rf /var/lib/slate
 	;;
 esac
 exit 0

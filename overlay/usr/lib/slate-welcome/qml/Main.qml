@@ -21,12 +21,22 @@ ApplicationWindow {
     property bool showCards: false
 
     // pages: full welcome = setup; after an upgrade = only what's new
-    readonly property var pages: backend.mode === "update"
+    readonly property var pages: backend.mode === "update" || backend.mode === "patch"
         ? ["whatsnew"]
         : ["theme", "accent", "wallpaper", "whatsnew"].concat(backend.hasCamera ? ["camera"] : []).concat(["done"])
 
     Shortcut { sequence: "Esc"; onActivated: showCards ? backend.finish() : skip() }
     function skip() { backend.skipIntro(); outro.complete(); showCards = true }
+    onShowCardsChanged: if (showCards) nextButton.forceActiveFocus()
+
+    // keyboard for choice tiles: Enter/Space choose, arrow keys move between tiles
+    function tileKeys(e, item, choose) {
+        if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter || e.key === Qt.Key_Space) choose()
+        else if (e.key === Qt.Key_Right || e.key === Qt.Key_Down) item.nextItemInFocusChain(true).forceActiveFocus()
+        else if (e.key === Qt.Key_Left || e.key === Qt.Key_Up) item.nextItemInFocusChain(false).forceActiveFocus()
+        else return
+        e.accepted = true
+    }
 
     // ------------------------------------------------------------------ intro
     Item {
@@ -109,6 +119,7 @@ ApplicationWindow {
 
         property int page: 0
         readonly property string kind: win.pages[page]
+        onPageChanged: nextButton.forceActiveFocus()   // Enter = Next; Tab reaches the tiles
 
         ColumnLayout {
             anchors.fill: parent
@@ -120,7 +131,7 @@ ApplicationWindow {
                     theme: "Light or dark?",
                     accent: "Pick an accent color",
                     wallpaper: "Choose a wallpaper",
-                    whatsnew: "What's new in " + backend.releaseName,
+                    whatsnew: backend.whatsNewTitle,
                     camera: "Turn on the FaceTime camera",
                     done: "You're all set"
                 })[card.kind]
@@ -137,7 +148,8 @@ ApplicationWindow {
                     theme: "You can switch any time in Quick Settings or System Settings > Colors & Themes.",
                     accent: "Used for highlights, buttons and folders.",
                     wallpaper: "Every Slate release brings a new rock. Agate, Basalt, and more to come.",
-                    whatsnew: "Slate " + backend.version + " " + backend.releaseName,
+                    whatsnew: backend.mode === "patch" ? "Updates to Slate " + backend.version + " " + backend.releaseName
+                                                       : "Slate " + backend.version + " " + backend.releaseName,
                     camera: "Your Mac's camera needs a driver and Apple firmware that Slate can download now (about 5 MB). You'll need your password.",
                     done: "Open the launcher at the bottom-left, or press the Meta key. Brave is Meta+B, Files is Meta+E. Type slate in Konsole for system info."
                 })[card.kind]
@@ -161,19 +173,24 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             spacing: 10
                             Rectangle {
+                                id: themeTile
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: width * 9 / 16
                                 radius: 14
                                 color: "transparent"
                                 border.width: themeRow.chosen === modelData.id ? 3 : 1
                                 border.color: themeRow.chosen === modelData.id ? win.lime : win.raised
+                                activeFocusOnTab: true
+                                function choose() { themeRow.chosen = modelData.id; backend.setTheme(modelData.id) }
+                                Keys.onPressed: (e) => win.tileKeys(e, themeTile, choose)
+                                FocusRing { visible: themeTile.activeFocus }
                                 Image {
                                     anchors.fill: parent; anchors.margins: 4
                                     source: modelData.img; fillMode: Image.PreserveAspectCrop
                                 }
                                 MouseArea {
                                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                                    onClicked: { themeRow.chosen = modelData.id; backend.setTheme(modelData.id) }
+                                    onClicked: themeTile.choose()
                                 }
                             }
                             Text { text: modelData.name; color: win.text; font.pixelSize: 16; Layout.alignment: Qt.AlignHCenter }
@@ -192,14 +209,19 @@ ApplicationWindow {
                         ColumnLayout {
                             spacing: 10
                             Rectangle {
+                                id: accentTile
                                 Layout.alignment: Qt.AlignHCenter
                                 width: 88; height: 88; radius: 44
                                 color: modelData.color
                                 border.width: accentRow.chosen === modelData.color ? 5 : 0
                                 border.color: win.text
+                                activeFocusOnTab: true
+                                function choose() { accentRow.chosen = modelData.color; backend.setAccent(modelData.color) }
+                                Keys.onPressed: (e) => win.tileKeys(e, accentTile, choose)
+                                FocusRing { visible: accentTile.activeFocus; gap: 7 }
                                 MouseArea {
                                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                                    onClicked: { accentRow.chosen = modelData.color; backend.setAccent(modelData.color) }
+                                    onClicked: accentTile.choose()
                                 }
                             }
                             Text { text: modelData.name; color: win.text; font.pixelSize: 16; Layout.alignment: Qt.AlignHCenter }
@@ -216,6 +238,14 @@ ApplicationWindow {
                     cellHeight: cellWidth * 0.72
                     model: backend.wallpapers
                     property string chosen: ""
+                    activeFocusOnTab: true
+                    keyNavigationEnabled: true
+                    function choose(i) { wpGrid.currentIndex = i; wpGrid.chosen = model[i].path; backend.setWallpaper(model[i].path) }
+                    Keys.onPressed: (e) => {
+                        if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter || e.key === Qt.Key_Space) {
+                            wpGrid.choose(wpGrid.currentIndex); e.accepted = true
+                        }
+                    }
                     delegate: Item {
                         width: wpGrid.cellWidth; height: wpGrid.cellHeight
                         Rectangle {
@@ -224,6 +254,7 @@ ApplicationWindow {
                             color: "transparent"
                             border.width: wpGrid.chosen === modelData.path ? 3 : 1
                             border.color: wpGrid.chosen === modelData.path ? win.lime : win.raised
+                            FocusRing { visible: wpGrid.activeFocus && wpGrid.currentIndex === index; gap: 3 }
                             Image {
                                 anchors.fill: parent; anchors.margins: 3; anchors.bottomMargin: 24
                                 source: modelData.thumb; fillMode: Image.PreserveAspectCrop
@@ -235,7 +266,7 @@ ApplicationWindow {
                             }
                             MouseArea {
                                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                                onClicked: { wpGrid.chosen = modelData.path; backend.setWallpaper(modelData.path) }
+                                onClicked: wpGrid.choose(index)
                             }
                         }
                     }
@@ -260,6 +291,7 @@ ApplicationWindow {
                     }
                     SlateButton {
                         id: useRock
+                        visible: backend.mode !== "patch"
                         text: "Use the " + backend.releaseName + " wallpaper"
                         onClicked: { backend.setWallpaper(backend.currentRockWallpaper); text = "Wallpaper set" }
                     }
@@ -313,7 +345,8 @@ ApplicationWindow {
                     onClicked: card.page--
                 }
                 SlateButton {
-                    text: card.page === win.pages.length - 1 ? "Start using Slate" : "Next"
+                    id: nextButton
+                    text: card.page === win.pages.length - 1 ? (backend.mode === "patch" ? "Done" : "Start using Slate") : "Next"
                     onClicked: card.page === win.pages.length - 1 ? backend.finish() : card.page++
                 }
             }

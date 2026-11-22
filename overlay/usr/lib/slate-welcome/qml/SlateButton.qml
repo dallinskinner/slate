@@ -9,10 +9,14 @@ AbstractButton {
     implicitHeight: 44
     hoverEnabled: true
     opacity: enabled ? 1 : 0.5
+    focusPolicy: Qt.StrongFocus
+    Keys.onReturnPressed: b.clicked()
+    Keys.onEnterPressed: b.clicked()
     background: Rectangle {
         radius: height / 2
         color: b.flat ? (b.hovered ? "#2a2b2f" : "transparent")
                       : (b.down ? "#92d630" : b.hovered ? "#ccf778" : "#b6f23a")
+        FocusRing { visible: b.activeFocus }
     }
     contentItem: Text {
         id: label

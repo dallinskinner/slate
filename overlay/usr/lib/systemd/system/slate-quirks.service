@@ -1,6 +1,6 @@
 [Unit]
 Description=Slate hardware quirks (e.g. Brave without GPU acceleration on nouveau)
-After=systemd-udev-settle.service local-fs.target
+After=systemd-udev-settle.service local-fs.target dbus.service
 
 [Service]
 Type=oneshot
