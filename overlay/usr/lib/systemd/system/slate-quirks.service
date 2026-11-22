@@ -1,0 +1,9 @@
+[Unit]
+Description=Slate hardware quirks (e.g. Brave without GPU acceleration on nouveau)
+After=systemd-udev-settle.service local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/slate/slate-quirks
+
+# Started at boot by the multi-user.target.wants symlink shipped next to this file (static).

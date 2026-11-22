@@ -66,8 +66,13 @@ for s in postinst prerm postrm; do sed "s/@DRIVER_VERSION@/$DVER/g" "$F/$s" > "$
 SIZE=$(du -sk --exclude=DEBIAN "$FS" | cut -f1)
 sed -e "s/@VERSION@/$FVER/" -e "s/@SIZE@/$SIZE/" "$F/control.in" > "$FS/DEBIAN/control"
 FDEB="$PKGOUT/slate-facetimehd_${FVER}_all.deb"
-dpkg-deb --root-owner-group -Zxz --build "$FS" "$FDEB" >/dev/null
-echo "built $FDEB"
+if [ -e "$REPO/pool/main/$(basename "$FDEB")" ]; then
+  cp "$REPO/pool/main/$(basename "$FDEB")" "$FDEB"   # already published: keep it byte-identical
+  echo "kept published $FDEB"
+else
+  dpkg-deb --root-owner-group -Zxz --build "$FS" "$FDEB" >/dev/null
+  echo "built $FDEB"
+fi
 DEBS+=("$FDEB")
 
 # 3. Signed apt repository (keeps older versions in the pool)

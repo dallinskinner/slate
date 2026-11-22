@@ -5,6 +5,7 @@ remove|abort-install|disappear)
 	dpkg-divert --quiet --package slate-desktop --remove --rename \
 		--divert /usr/lib/os-release.debian /usr/lib/os-release
 	rm -f /usr/share/kglobalaccel/brave-browser.desktop
+	rm -f /etc/brave/policies/managed/slate-gpu.json
 	;;
 esac
 exit 0

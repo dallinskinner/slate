@@ -1,0 +1,25 @@
+#!/bin/sh
+# Slate hardware quirks, applied at every boot by slate-quirks.service (and by the
+# slate-desktop postinst). Each quirk is detected fresh, so moving a disk to other
+# hardware undoes it.
+POL=/etc/brave/policies/managed/slate-gpu.json
+
+# NVIDIA GPU driven by nouveau (e.g. MacBook Pro A1398 with the GeForce GT 750M, where the
+# firmware turns off the Intel GPU): Brave's GPU acceleration freezes the browser.
+nouveau_nvidia() {
+	for d in /sys/bus/pci/devices/*; do
+		[ "$(cat "$d/vendor" 2>/dev/null)" = 0x10de ] || continue
+		case "$(cat "$d/class" 2>/dev/null)" in 0x03*) ;; *) continue ;; esac
+		[ -e /proc/driver/nvidia ] && return 1      # proprietary driver: acceleration is fine
+		return 0
+	done
+	return 1
+}
+
+if nouveau_nvidia; then
+	mkdir -p "${POL%/*}"
+	printf '{\n  "HardwareAccelerationModeEnabled": false\n}\n' > "$POL"
+else
+	rm -f "$POL"
+fi
+exit 0

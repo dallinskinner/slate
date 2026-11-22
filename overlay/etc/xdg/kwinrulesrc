@@ -1,11 +1,13 @@
-# Slate: keep Slate Welcome above windows that Plasma restores from the last session
+# Slate: let Slate Welcome bring itself to the front after login (over windows Plasma
+# restores from the last session) without pinning it above everything: the password
+# prompt, Konsole and other apps can still come forward.
 [General]
 count=1
 rules=slate-welcome
 
 [slate-welcome]
-Description=Slate Welcome stays on top
+Description=Slate Welcome may take focus
 wmclass=slate-welcome
 wmclassmatch=1
-above=true
-aboverule=2
+fsplevel=0
+fsplevelrule=2

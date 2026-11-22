@@ -250,6 +250,8 @@ class Backend(QObject):
         def fin(code, _st=None):
             self._status = 'done' if code == 0 else 'failed'; self.statusChanged.emit()
         p.finished.connect(fin)
+        # pkexec missing or not runnable: finished never fires, so report failure here
+        p.errorOccurred.connect(lambda e: e == QProcess.ProcessError.FailedToStart and fin(1))
         p.start('pkexec', ['sh', '-c', 'apt-get update && DEBIAN_FRONTEND=noninteractive '
                                        'apt-get install -y slate-facetimehd'])
 
@@ -283,6 +285,8 @@ def main():
         return 1
     win = engine.rootObjects()[0]
     win.raise_(); win.requestActivate()
+    if '--auto' in args:     # once more, in case restored windows were still opening
+        QTimer.singleShot(3000, lambda: (win.raise_(), win.requestActivate()))
     shot = os.environ.get('SLATE_WELCOME_SHOT')    # dev: save screenshots, e.g. "/tmp/w:3,5"
     if shot:
         base, _, times = shot.partition(':')
