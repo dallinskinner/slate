@@ -2,7 +2,7 @@
 # slate: small helper for Slate systems
 notes() {   # point-update notes for this release, newest first
 	. /etc/os-release
-	ls /usr/share/slate/releases/"$VERSION_ID".*.md 2>/dev/null | sort -t. -k3,3nr | while read -r f; do
+	ls /usr/share/slate/releases/"$VERSION_ID".*.md 2>/dev/null | sort -t. -k3,3nr -k4,4nr | while read -r f; do
 		cat "$f"; echo
 	done
 }
@@ -60,9 +60,15 @@ case "${1:-info}" in
            dpkg-query -W -f='slate-desktop ${Version}\n\n' slate-desktop 2>/dev/null
            notes ;;
   doctor)  doctor ;;
-  shale)   shale "${2:-happy}"; . /etc/os-release
-           echo "Hi, I'm Shale. This release I live in a ${SLATE_CODENAME:-basalt} shell."
-           echo "Tip: $(tip)" ;;
+  shale)   face=${2:-happy}
+           case "$face" in
+             happy|joy|sleepy|confused|wink)
+               shale "$face"; . /etc/os-release
+               echo "Hi, I'm Shale. This release I live in a ${SLATE_CODENAME:-basalt} shell."
+               echo "Tip: $(tip)" ;;
+             *) shale confused
+                echo "Shale doesn't have a face called \"$face\". Try: happy, joy, sleepy, confused or wink." ;;
+           esac ;;
   help|-h|--help) slate usage ;;
   usage)   echo "usage: slate [info|welcome|update|version|doctor|shale]"
            echo "  info     system info with this release's rock (default)"
