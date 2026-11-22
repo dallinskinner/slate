@@ -94,7 +94,7 @@ def notify_patch(patch, notes):
     body = next((l.strip('-* ').strip() for l in notes.splitlines()
                  if l.strip() and not l.startswith('#')), 'Fixes and improvements.')
     try:
-        r = subprocess.run(['notify-send', '--app-name=Slate', '--icon=slate-launcher',
+        r = subprocess.run(['notify-send', '--app-name=Slate', '--icon=slate-shale',
                             "--action=notes=What's new", f'Slate updated to {patch}', body],
                            capture_output=True, text=True)
     except OSError:
@@ -232,6 +232,10 @@ class Backend(QObject):
     def logo(self):    # transparent PNG wordmark (made by branding/build-assets.py)
         return QUrl.fromLocalFile(TEST_ROOT + '/usr/share/plasma/look-and-feel/org.slate.desktop/'
                                   'contents/splash/images/slate-wordmark.png').toString()
+    @pyqtSlot(str, result=str)
+    def shale(self, face):   # Shale the hermit crab in this release's rock shell
+        f = os.path.join(SHARE, 'shale', f'{self._name.lower()}-{face}.png')
+        return QUrl.fromLocalFile(f).toString() if os.path.exists(f) else ''
     @pyqtProperty(str, constant=True)
     def whatsNew(self):
         if self._mode == 'patch':

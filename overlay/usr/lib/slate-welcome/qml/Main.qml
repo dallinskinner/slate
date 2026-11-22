@@ -151,7 +151,7 @@ ApplicationWindow {
                     whatsnew: backend.mode === "patch" ? "Updates to Slate " + backend.version + " " + backend.releaseName
                                                        : "Slate " + backend.version + " " + backend.releaseName,
                     camera: "Your Mac's camera needs a driver and Apple firmware that Slate can download now (about 5 MB). You'll need your password.",
-                    done: "Open the launcher at the bottom-left, or press the Meta key. Brave is Meta+B, Files is Meta+E. Type slate in Konsole for system info."
+                    done: "Open the launcher at the bottom-left, or press the Meta key. Brave is Meta+B, Files is Meta+E. This is Shale, the Slate hermit crab: he moves into a new rock every release. Say hi with slate shale in Konsole."
                 })[card.kind]
             }
 
@@ -311,13 +311,14 @@ ApplicationWindow {
                     Item { Layout.fillHeight: true }
                 }
 
-                // done
+                // done: Shale the hermit crab sees you off
                 Item {
                     Image {
                         anchors.centerIn: parent
-                        source: backend.logo
-                        sourceSize.height: 70
-                        opacity: 0.9
+                        source: backend.shale("joy") || backend.logo
+                        height: Math.min(parent.height, 230)
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true; mipmap: true
                     }
                 }
             }
@@ -336,6 +337,14 @@ ApplicationWindow {
                             Behavior on width { NumberAnimation { duration: 200 } }
                         }
                     }
+                }
+                Image {   // Shale waves from the corner of the patch notes
+                    visible: backend.mode === "patch"
+                    source: visible ? backend.shale("small-happy") : ""
+                    Layout.preferredHeight: 92
+                    Layout.preferredWidth: 92 * (implicitWidth / Math.max(1, implicitHeight))
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true; mipmap: true
                 }
                 Item { Layout.fillWidth: true }
                 SlateButton {

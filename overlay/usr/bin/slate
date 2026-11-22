@@ -7,6 +7,26 @@ notes() {   # point-update notes for this release, newest first
 	done
 }
 
+shale() {   # shale <face> [small]: Shale the hermit crab, in this release's rock shell
+	. /etc/os-release
+	d=/usr/share/slate/shale; rock=${SLATE_CODENAME:-basalt}
+	f="$d/$rock-${2:+small-}$1.txt"; [ -e "$f" ] || f=$(ls "$d"/*-"${2:+small-}$1".txt 2>/dev/null | tail -1)
+	[ -n "$f" ] && [ -e "$f" ] && cat "$f"
+}
+
+tip() {
+	set -- \
+		"Meta+B opens Brave, Meta+E opens Files, Ctrl+Alt+T opens this terminal." \
+		"slate update installs every update: Debian, apps and Slate." \
+		"Something broken? slate doctor saves a report you can paste into a message." \
+		"Every Slate release is named after a rock, and I move into each one." \
+		"Quick Settings (bottom-right) switches between Slate dark and light." \
+		"slate welcome replays the welcome and quick setup." \
+		"Hermit crabs swap shells as they grow. Slate does too."
+	shift $(( $(od -An -N1 -tu1 /dev/urandom) % $# ))
+	echo "$1"
+}
+
 doctor() {   # troubleshooting report: ~/slate-doctor.txt, also copied to the clipboard
 	out="$HOME/slate-doctor.txt"
 	{
@@ -28,7 +48,8 @@ doctor() {   # troubleshooting report: ~/slate-doctor.txt, also copied to the cl
 		echo; echo "== Recent errors (this boot)"; journalctl -b -p err --no-pager -q -n 50 2>/dev/null
 	} > "$out" 2>&1
 	command -v wl-copy >/dev/null && [ -n "${WAYLAND_DISPLAY:-}" ] && wl-copy < "$out" && copied=" and copied to the clipboard"
-	echo "Saved to $out${copied:-}. Paste it into a message to share it."
+	shale happy small
+	echo "Shale saved a report to $out${copied:-}. Paste it into a message to share it."
 }
 
 case "${1:-info}" in
@@ -39,10 +60,17 @@ case "${1:-info}" in
            dpkg-query -W -f='slate-desktop ${Version}\n\n' slate-desktop 2>/dev/null
            notes ;;
   doctor)  doctor ;;
-  *)       echo "usage: slate [info|welcome|update|version|doctor]"
+  shale)   shale "${2:-happy}"; . /etc/os-release
+           echo "Hi, I'm Shale. This release I live in a ${SLATE_CODENAME:-basalt} shell."
+           echo "Tip: $(tip)" ;;
+  help|-h|--help) slate usage ;;
+  usage)   echo "usage: slate [info|welcome|update|version|doctor|shale]"
            echo "  info     system info with this release's rock (default)"
            echo "  welcome  replay the welcome animation and quick setup"
            echo "  update   install all updates (Debian, apps and Slate)"
            echo "  version  Slate version and what changed in recent updates"
-           echo "  doctor   save a troubleshooting report (and copy it to the clipboard)" ;;
+           echo "  doctor   save a troubleshooting report (and copy it to the clipboard)"
+           echo "  shale    say hi to Shale, the Slate hermit crab (faces: happy joy sleepy confused wink)" ;;
+  *)       shale confused small
+           echo "Shale doesn't know \"slate $1\"."; echo; slate usage; exit 1 ;;
 esac

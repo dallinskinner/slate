@@ -200,3 +200,29 @@ print('live splash updated')
 # --- Terminal logo of the current release (fastfetch reads ascii/current.txt) ---
 shutil.copy(out('usr', 'share', 'slate', 'ascii', f'{cur[1].lower()}.txt'),
             out('usr', 'share', 'slate', 'ascii', 'current.txt'))
+
+# --- Shale, the Slate hermit crab: wears each release's rock as its shell ---
+sys.path.insert(0, HERE)
+import mascot
+for rel in rocks.RELEASES:
+    key = rel[1].lower()
+    for face in mascot.FACES:
+        g = mascot.build(mascot.BIG, rel, face)
+        mascot.render(g, font_px=28, pad=8, bg=None).save(out('usr', 'share', 'slate', 'shale', f'{key}-{face}.png'))
+        with open(out('usr', 'share', 'slate', 'shale', f'{key}-{face}.txt'), 'w') as f:
+            f.write(mascot.to_ansi(g))
+    for face in ('happy', 'confused', 'sleepy'):
+        g = mascot.build(mascot.SMALL, rel, face)
+        with open(out('usr', 'share', 'slate', 'shale', f'{key}-small-{face}.txt'), 'w') as f:
+            f.write(mascot.to_ansi(g))
+        mascot.render(g, font_px=28, pad=6, bg=None).save(out('usr', 'share', 'slate', 'shale', f'{key}-small-{face}.png'))
+# notification / app icon: small Shale on a dark rounded tile (readable in light themes too)
+small = mascot.render(mascot.build(mascot.SMALL, cur, 'happy'), font_px=40, pad=0, bg=None)
+for size in (48, 128, 256):
+    tile = Image.new('RGBA', (size * 4, size * 4), (0, 0, 0, 0))
+    ImageDraw.Draw(tile).rounded_rectangle((0, 0, size * 4 - 1, size * 4 - 1), radius=size * 4 // 5, fill=INK)
+    k = size * 4 * 0.86 / max(small.size)
+    s = small.resize((round(small.width * k), round(small.height * k)), Image.LANCZOS)
+    tile.alpha_composite(s, ((tile.width - s.width) // 2, (tile.height - s.height) // 2))
+    tile.resize((size, size), Image.LANCZOS).save(out('usr', 'share', 'icons', 'hicolor', f'{size}x{size}', 'apps', 'slate-shale.png'))
+print('shale written')

@@ -100,17 +100,32 @@ def to_text(g):
     return '\n'.join(''.join(c for c, _s, _k in row).rstrip() for row in g)
 
 
-def render(g, font_px=28, pad=24):
+def to_ansi(g):
+    """Truecolor terminal version (for `slate shale`)."""
+    out = []
+    for row in g:
+        line = ''; cur = None
+        for c, s, k in row:
+            col = R.shade_color(s) if k == 'shell' else TEXT
+            if c != ' ' and col != cur:
+                line += '\033[38;2;%d;%d;%dm' % col; cur = col
+            line += c
+        out.append(line.rstrip() + '\033[0m')
+    return '\n'.join(out) + '\n'
+
+
+def render(g, font_px=28, pad=24, bg=R.BG):
+    """PNG of Shale; bg=None gives a transparent background."""
     font = ImageFont.truetype(R.FONT, font_px)
     cw = font.getlength('M'); ch = int(font_px * 1.17)
     W = int(cw * len(g[0]) + 2 * pad); H = ch * len(g) + 2 * pad
-    img = Image.new('RGB', (W, H), R.BG)
+    img = Image.new('RGBA', (W, H), (0, 0, 0, 0) if bg is None else bg + (255,))
     d = ImageDraw.Draw(img)
     for y, row in enumerate(g):
         for x, (c, s, k) in enumerate(row):
             if c == ' ': continue
             col = R.shade_color(s) if k == 'shell' else TEXT
-            d.text((pad + x * cw, pad + y * ch), c, font=font, fill=col)
+            d.text((pad + x * cw, pad + y * ch), c, font=font, fill=col + (255,))
     return img
 
 
